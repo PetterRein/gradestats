@@ -76,9 +76,9 @@ def retrieve_exam_type_of_years(
                 exam_status: Optional[bs4.element.Tag] = dt.find(class_="exam-code")
                 
                 # skip continuation exam
-                is_ordinary = exam_status.find("abbr").text.strip() == "ORD"
-                if not is_ordinary:
-                    continue
+                #is_ordinary = exam_status.find("abbr").text.strip() == "ORD"
+                #if not is_ordinary:
+                #    continue
                 
                 term_std = ""
                 term_txt = term.text.strip()
@@ -86,15 +86,43 @@ def retrieve_exam_type_of_years(
                     term_std = "Spring"
                 elif term_txt == "Høst":
                     term_std = "Fall"
+                elif term_txt == "Sommer":
+                    term_std = "Summer"
                 else:
                     continue
                 term_is_digital_dict[term_std] = system.text.strip() == "INSPERA"
             result[year] = term_is_digital_dict
             # sleep a little bit to avoid hammering the website
-            noise = random.random() * sleep_time_mean_ms / 2 - sleep_time_mean_ms / 4
-            time_to_sleep = sleep_time_mean_ms + noise
-            time.sleep(time_to_sleep)
+            time.sleep(0.05)
         return result
+
+
+def course_have_digital_exam_semester(course_code: str, year: str, semester_code: str):
+    semester_code = 'Spring' if semester_code == "V" else 'Fall' if semester_code == "H" else 'Summer'
+    years = []
+    years.append(year)
+    results = retrieve_exam_type_of_years(course_code, years)
+    if (results):
+        if (results[year].get(semester_code)):
+            return True
+        else:
+            return False
+    return False
+
+
+def course_have_digital_exam(course_code: str):
+    digitalExams = retrieve_exams_digital_course(course_code)
+    for i in range(2010,2020): # TODO: Probaly change the values here
+      exams_year = digitalExams[str(i)]
+      for key, value in exams_year.items(): 
+         if True == value: 
+             return True
+    return False
+
+
+def retrieve_exams_digital_course(course_code: str) -> List[str]:
+    years = retrieve_exam_years(course_code)
+    return retrieve_exam_type_of_years(course_code, years)
 
 
 def warn(text: str):
@@ -102,12 +130,13 @@ def warn(text: str):
 
 
 def _test_functions():
-    course_code = "TDT4127" # "TDT4100" TDT4117 IT3010 TDT4127 (itgk)
-    years = retrieve_exam_years(course_code)
-    print(retrieve_exam_type_of_years(course_code, years))
-    # exam_is_digital("IT3010")
+    #course_code = "TDT4127" # "TDT4100" TDT4117 IT3010 TDT4127 (itgk)
+    #years = retrieve_exam_years(course_code)
+    #print(retrieve_exam_type_of_years(course_code, years))
+    #print(course_have_digital_exam("IT3010"))
+    print(course_have_digital_exam_semester("TDT4100", 2018, "H"))
+
 
 
 if __name__ == '__main__':
     _test_functions()
-
