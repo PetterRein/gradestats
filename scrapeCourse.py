@@ -22,10 +22,30 @@ def getCourseData(code, faculty):
       credit = float(facts_about_course[2].split("\n")[2][20:24])
     except ValueError:
       print("Not valid number, number is: ", facts_about_course[2].split("\n")[2])
-    norwegianNameRaw = soup_no.title.get_text().split("-")[1]
-    norwegianName = norwegianNameRaw[1:len(norwegianNameRaw)-1]
-    englishNameRaw = soup_eng.title.get_text().split("-")[1]
-    englishName = englishNameRaw[1:len(englishNameRaw)-1]
+    norwegianNameRaw = soup_no.title.get_text().split("-")
+    norwegianName = ""
+    if (len(norwegianNameRaw) > 4):
+      norwegianName = norwegianNameRaw[1][1:len(norwegianNameRaw[1])]
+      for i in range(2, len(norwegianNameRaw) - 4):
+        norwegianName += "-"
+        norwegianName += norwegianNameRaw[i]
+      norwegianName += "-"
+      norwegianName += norwegianNameRaw[len(norwegianNameRaw) - 3] [0:len(norwegianNameRaw[len(norwegianNameRaw) - 3]) - 1]
+    else:
+      norwegianName = norwegianNameRaw[1][1:len(norwegianNameRaw[1]) - 1]
+    englishNameRaw = soup_eng.title.get_text().split("-")
+    englishName = ""
+    if (len(englishNameRaw) > 4):
+      englishName = englishNameRaw[1][1:len(englishNameRaw[1])]
+      for i in range(2, len(englishNameRaw) - 4):
+        englishName += "-"
+        englishName += englishNameRaw[i]
+      englishName += "-"
+      englishName += englishNameRaw[len(englishNameRaw) - 3] [0:len(englishNameRaw[len(englishNameRaw) - 3]) - 1]
+    else:
+      englishName = englishNameRaw[1][1:len(englishNameRaw[1]) - 1]
+    print(norwegianName)
+    print(englishName)
     courseLevelText = facts_about_course[3].split("\n")[0][1:len(facts_about_course[3].split("\n")[0])]
     study_level = courseLevel(courseLevelText, code)
     last_year_taught = 0
